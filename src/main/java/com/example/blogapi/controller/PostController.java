@@ -8,6 +8,7 @@ import com.example.blogapi.service.PostService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -26,26 +27,55 @@ public class PostController {
         return postService.getAllPosts(pageable);
     }
 
+    @GetMapping("/my-stories")
+    public Page<PostResponse> getMyStories(
+            Authentication authentication,
+            @PageableDefault(size = 10) Pageable pageable) {
+
+        return postService.getMyStories(
+                authentication.getName(),
+                pageable
+        );
+    }
+
     @GetMapping("/{id}")
     public PostResponse getPostById(@PathVariable Long id) {
         return postService.getPostById(id);
     }
 
     @PostMapping
-    public PostResponse createPost(@RequestBody PostRequest request) {
-        return postService.createPost(request);
+    public PostResponse createPost(
+            @RequestBody PostRequest request,
+            Authentication authentication) {
+
+        return postService.createPost(
+                request,
+                authentication.getName()
+        );
     }
 
     @PutMapping("/{id}")
     public PostResponse updatePost(
             @PathVariable Long id,
-            @RequestBody PostRequest request) {
-        return postService.updatePost(id, request);
+            @RequestBody PostRequest request,
+            Authentication authentication) {
+
+        return postService.updatePost(
+                id,
+                request,
+                authentication.getName()
+        );
     }
 
     @DeleteMapping("/{id}")
-    public void deletePost(@PathVariable Long id) {
-        postService.deletePost(id);
+    public void deletePost(
+            @PathVariable Long id,
+            Authentication authentication) {
+
+        postService.deletePost(
+                id,
+                authentication.getName()
+        );
     }
 
     @GetMapping("/search")
@@ -53,6 +83,11 @@ public class PostController {
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String category,
             @PageableDefault(size = 10) Pageable pageable) {
-        return postService.searchPosts(title, category, pageable);
+
+        return postService.searchPosts(
+                title,
+                category,
+                pageable
+        );
     }
 }

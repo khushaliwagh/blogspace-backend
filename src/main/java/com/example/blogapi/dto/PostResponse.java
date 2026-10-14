@@ -7,6 +7,8 @@ public class PostResponse {
     private String title;
     private String content;
     private String category;
+    private Long authorId;
+    private String authorName;
 
     public PostResponse() {
     }
@@ -41,5 +43,20 @@ public class PostResponse {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+    public Long getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(Long authorId) {
+        this.authorId = authorId;
+    }
+
+    public String getAuthorName() {
+        return authorName;
+    }
+
+    public void setAuthorName(String authorName) {
+        this.authorName = authorName;
     }
 }

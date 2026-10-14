@@ -1,14 +1,11 @@
-
 package com.example.blogapi.config;
 
 import com.example.blogapi.service.CustomUserDetailsService;
 
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import org.springframework.http.HttpStatus;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -16,6 +13,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
@@ -78,12 +76,21 @@ public class SecurityConfig {
             .authenticationProvider(provider)
             .authorizeHttpRequests(auth -> auth
 
+                // Public registration and login
                 .requestMatchers(
                     HttpMethod.POST,
                     "/api/auth/register",
                     "/api/auth/login"
                 ).permitAll()
 
+                // My Stories must require login.
+                // Keep this BEFORE the public GET rules.
+                .requestMatchers(
+                    HttpMethod.GET,
+                    "/api/posts/my-stories"
+                ).authenticated()
+
+                // Public story and comment-reading endpoints
                 .requestMatchers(
                     HttpMethod.GET,
                     "/api/posts",
@@ -92,7 +99,7 @@ public class SecurityConfig {
                     "/api/posts/*/comments"
                 ).permitAll()
 
-                // Like/Unlike endpoints
+                // Like endpoints
                 .requestMatchers(
                     HttpMethod.GET,
                     "/api/posts/*/likes"
@@ -113,14 +120,17 @@ public class SecurityConfig {
                     "/api/posts/*/like"
                 ).authenticated()
 
+                // Authentication endpoints
                 .requestMatchers("/api/auth/me").authenticated()
                 .requestMatchers("/api/auth/logout").authenticated()
 
+                // Adding comments requires login
                 .requestMatchers(
                     HttpMethod.POST,
                     "/api/posts/*/comments"
                 ).authenticated()
 
+                // Creating, updating and deleting stories requires login
                 .requestMatchers(
                     HttpMethod.POST,
                     "/api/posts/**"

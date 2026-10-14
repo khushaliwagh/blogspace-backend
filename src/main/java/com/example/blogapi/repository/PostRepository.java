@@ -9,6 +9,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Repository
 public interface PostRepository
@@ -20,4 +22,9 @@ public interface PostRepository
 
     @Query("SELECT p FROM Post p WHERE p.category = :category")
     List<Post> findByCategory(@Param("category") String category);
+    
+    Page<Post> findByAuthor_EmailIgnoreCase(
+            String email,
+            Pageable pageable
+    );
 }

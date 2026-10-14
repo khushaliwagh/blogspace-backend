@@ -9,6 +9,10 @@ import java.util.List;
 @Table(name = "posts")
 public class Post {
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id")
+	private User author;
+	
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -64,5 +68,12 @@ public class Post {
 
     public void setComments(List<Comment> comments) {
         this.comments = comments;
+    }
+    public User getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(User author) {
+        this.author = author;
     }
 }
