@@ -2,6 +2,12 @@ package com.example.blogapi.config;
 
 import com.example.blogapi.service.CustomUserDetailsService;
 
+import java.util.List;
+
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -25,6 +31,37 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOrigins(
+            List.of("https://blogspace-frontend-3q10.onrender.com")
+        );
+
+        configuration.setAllowedMethods(
+            List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")
+        );
+
+        configuration.setAllowedHeaders(
+            List.of(
+                "Content-Type",
+                "Accept",
+                "X-XSRF-TOKEN",
+                "X-CSRF-TOKEN"
+            )
+        );
+
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source =
+            new UrlBasedCorsConfigurationSource();
+
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
     }
 
     @Bean
@@ -58,7 +95,10 @@ public class SecurityConfig {
             throws Exception {
 
         http
-            .csrf(csrf -> csrf
+        .cors(cors ->
+            cors.configurationSource(corsConfigurationSource())
+        )
+        .csrf(csrf -> csrf
                 .csrfTokenRepository(
                     CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .csrfTokenRequestHandler(
